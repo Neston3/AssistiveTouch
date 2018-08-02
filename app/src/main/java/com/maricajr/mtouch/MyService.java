@@ -1,5 +1,6 @@
 package com.maricajr.mtouch;
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.Service;
 import android.content.Context;
@@ -41,17 +42,19 @@ import java.util.Objects;
 public class MyService extends Service implements View.OnTouchListener, View.OnClickListener {
 
     private View topLeftView;
+
     private ImageView overlayedButton;
-    private float offsetX;
-    private float offsetY;
-    private int originalXPos;
-    private int originalYPos;
     private boolean moving;
     private WindowManager windowManager;
     private Boolean enable=true;
     private ArrayList<String> itemTitles;
     List<Integer> imageList;
     int imageIndex;
+    private float offsetX;
+    private float offsetY;
+    private int originalXPos;
+    private int originalYPos;
+
 
     @Nullable
     @Override
@@ -60,6 +63,7 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
         return null;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate() {
         super.onCreate();
@@ -78,15 +82,33 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
         WindowManager.LayoutParams params =
                 new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.TYPE_SYSTEM_ALERT,
+                        WindowManager.LayoutParams.TYPE_PHONE | WindowManager.LayoutParams.TYPE_TOAST,
                         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ,
                         PixelFormat.TRANSLUCENT);
 
-        params.gravity = Gravity.LEFT | Gravity.TOP;
+        params.gravity = Gravity.START | Gravity.TOP;
         params.x = 0;
         params.y = 0;
 
         windowManager.addView(overlayedButton, params);
+
+
+        topLeftView = new View(this);
+
+        WindowManager.LayoutParams topLeftParams = new WindowManager.LayoutParams
+                (WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.TYPE_PHONE,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
+
+        topLeftParams.gravity = Gravity.START | Gravity.TOP;
+
+        topLeftParams.x = 0;
+        topLeftParams.y = 0;
+        topLeftParams.width = 0;
+        topLeftParams.height = 0;
+        windowManager.addView(topLeftView, topLeftParams);
 
        // setImageList(ImageAssetsSource.getImageAsset());
 
@@ -99,6 +121,8 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
         if (overlayedButton != null) {
 
             windowManager.removeView(overlayedButton);
+            windowManager.removeView(topLeftView);
+            topLeftView=null;
             overlayedButton = null;
 
         }
@@ -108,28 +132,29 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
 
     @Override
     public void onClick(View view) {
+//        if (view.isClickable()){
+//            Toast.makeText(this, "yes", Toast.LENGTH_SHORT).show();
+//        }else {
+//            Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
+//        }
+
         showWindow();
     }
 
     private void showWindow() {
 
-        WindowManager.LayoutParams param2 =
-                new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.TYPE_PHONE,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ,
-                        PixelFormat.TRANSLUCENT);
-
         LayoutInflater inflater= (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popview=inflater.inflate(R.layout.custom_window,null);
+        assert inflater != null;
+        @SuppressLint("InflateParams") View popview=inflater.inflate(R.layout.custom_window,null);
 
-        final PopupWindow popupWindow=new PopupWindow(popview, WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT);
+        final PopupWindow popupWindow=new PopupWindow(popview, WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT);
         popupWindow.update();
 
         if (enable){
             popupWindow.showAsDropDown(overlayedButton,50,-30);
+            Toast.makeText(this, "Show", Toast.LENGTH_SHORT).show();
             enable=false;
         }
 
@@ -170,51 +195,57 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
 
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) overlayedButton.getLayoutParams();
 
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
             float x = motionEvent.getRawX();
             float y = motionEvent.getRawY();
+
             moving = false;
+
             int[] location = new int[2];
             overlayedButton.getLocationOnScreen(location);
             originalXPos = location[0];
             originalYPos = location[1];
+
             offsetX = originalXPos - x;
             offsetY = originalYPos - y;
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
             int[] topLeftLocationOnScreen = new int[2];
+            topLeftView.getLocationOnScreen(topLeftLocationOnScreen);
+
             float x = motionEvent.getRawX();
             float y = motionEvent.getRawY();
-            WindowManager.LayoutParams params = (WindowManager.LayoutParams) overlayedButton.getLayoutParams();
+
             int newX = (int) (offsetX + x);
             int newY = (int) (offsetY + y);
 
-            if (Math.abs(newX - originalXPos) < 1 && Math.abs(newY - originalYPos) < 1 && !moving) {
+            if (Math.abs(newX - originalXPos) <=0 && Math.abs(newY - originalYPos) <=0 && !moving) {
 
                 return false;
-
             }
 
             params.x = newX - (topLeftLocationOnScreen[0]);
             params.y = newY - (topLeftLocationOnScreen[1]);
 
             windowManager.updateViewLayout(overlayedButton, params);
+
             moving = true;
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
 
-            if (moving) {
-                return true;
-            }
+            return moving;
 
         }
 
         return false;
+
     }
 
     public void setImageList(List<Integer> imageList) {
