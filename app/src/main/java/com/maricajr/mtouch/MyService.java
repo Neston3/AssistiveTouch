@@ -70,9 +70,6 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
 
         windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
-        /*LayoutInflater layoutInflater= (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view=layoutInflater.inflate(R.layout.custom_window,null);*/
-
         overlayedButton = new ImageView(this);
         overlayedButton.setImageResource(R.mipmap.float_widget);
         overlayedButton.setOnTouchListener(this);
