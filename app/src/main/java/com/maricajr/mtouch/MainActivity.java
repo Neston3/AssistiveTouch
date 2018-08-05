@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
                 createRunningService();
             }
-        } else {
+        } else if (android.os.Build.VERSION.SDK_INT <= 22) {
             createRunningService();
         }
     }
