@@ -91,6 +91,8 @@ public class MainActivity extends AppCompatActivity {
 
                 createRunningService();
                 }
+        } else {
+            createRunningService();
         }
     }
 
@@ -105,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
 
                 createRunningService();
             }
+        } else {
+            createRunningService();
         }
     }
 
