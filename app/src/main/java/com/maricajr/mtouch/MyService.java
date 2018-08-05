@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -67,46 +68,7 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
     @Override
     public void onCreate() {
         super.onCreate();
-
-        windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-
-        overlayedButton = new ImageView(this);
-        overlayedButton.setImageResource(R.mipmap.float_widget);
-        overlayedButton.setOnTouchListener(this);
-        overlayedButton.setOnClickListener(this);
-
-
-        WindowManager.LayoutParams params =
-                new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.TYPE_PHONE | WindowManager.LayoutParams.TYPE_TOAST,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ,
-                        PixelFormat.TRANSLUCENT);
-
-        params.gravity = Gravity.START | Gravity.TOP;
-        params.x = 0;
-        params.y = 0;
-
-        windowManager.addView(overlayedButton, params);
-
-
-        topLeftView = new View(this);
-
-        WindowManager.LayoutParams topLeftParams = new WindowManager.LayoutParams
-                (WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.TYPE_PHONE,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
-
-        topLeftParams.gravity = Gravity.START | Gravity.TOP;
-
-        topLeftParams.x = 0;
-        topLeftParams.y = 0;
-        topLeftParams.width = 0;
-        topLeftParams.height = 0;
-        windowManager.addView(topLeftView, topLeftParams);
-
+        createMtouch();
        // setImageList(ImageAssetsSource.getImageAsset());
 
     }
@@ -251,6 +213,68 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
 
     public void setImageIndex(int imageIndex) {
         this.imageIndex = imageIndex;
+    }
+
+    //Added method
+    private void createMtouch(){
+        windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+
+        overlayedButton = new ImageView(this);
+        overlayedButton.setImageResource(R.mipmap.float_widget);
+        overlayedButton.setOnTouchListener(this);
+        overlayedButton.setOnClickListener(this);
+
+
+        WindowManager.LayoutParams params;
+        // edited code starts from here
+        /*=
+                new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.TYPE_PHONE | WindowManager.LayoutParams.TYPE_TOAST,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ,
+                        PixelFormat.TRANSLUCENT);
+                        */
+
+        //the added code...
+        // we have to differentiate between the type_phone and the type_application overlay
+        int LAYOUT_FLAG;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        } else {
+            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
+        }
+
+        params = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                LAYOUT_FLAG,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                PixelFormat.TRANSLUCENT);
+
+
+        params.gravity = Gravity.START | Gravity.TOP;
+        params.x = 0;
+        params.y = 0;
+
+        windowManager.addView(overlayedButton, params);
+
+
+        topLeftView = new View(this);
+
+        WindowManager.LayoutParams topLeftParams = new WindowManager.LayoutParams
+                (WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.TYPE_PHONE,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
+
+        topLeftParams.gravity = Gravity.START | Gravity.TOP;
+
+        topLeftParams.x = 0;
+        topLeftParams.y = 0;
+        topLeftParams.width = 0;
+        topLeftParams.height = 0;
+        windowManager.addView(topLeftView, topLeftParams);
     }
 
 }
