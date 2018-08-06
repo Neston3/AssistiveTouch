@@ -3,6 +3,7 @@ package com.maricajr.mtouch;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,9 +15,11 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,19 +34,14 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.jh.circularlist.CircularListView;
-import com.jh.circularlist.CircularTouchListener;
-
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class MyService extends Service implements View.OnTouchListener, View.OnClickListener {
 
+    private RelativeLayout relativeLayout;
     private View topLeftView;
-
     private ImageView overlayedButton;
     private boolean moving;
     private WindowManager windowManager;
@@ -56,6 +54,10 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
     private int originalXPos;
     private int originalYPos;
 
+    private int initialX;
+    private int initialY;
+    private float initialTouchX;
+    private float initialTouchY;
 
     @Nullable
     @Override
@@ -69,7 +71,44 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
     public void onCreate() {
         super.onCreate();
         createMtouch();
-       // setImageList(ImageAssetsSource.getImageAsset());
+
+    }
+
+    private void createMtouch() {
+
+        windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+
+
+        overlayedButton = new ImageView(this);
+        overlayedButton.setImageResource(R.mipmap.float_widget);
+        overlayedButton.setOnTouchListener(this);
+        overlayedButton.setOnClickListener(this);
+
+
+        int LAYOUT_PARAMS;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            LAYOUT_PARAMS=WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
+        }else {
+            LAYOUT_PARAMS=WindowManager.LayoutParams.TYPE_PHONE;
+        }
+        WindowManager.LayoutParams params=
+                new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        LAYOUT_PARAMS,
+                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ,
+                        PixelFormat.TRANSLUCENT);
+
+        params.gravity = Gravity.START | Gravity.TOP;
+        params.x = 0;
+        params.y = 0;
+
+        relativeLayout=new RelativeLayout(this);
+        RelativeLayout.LayoutParams params_imageview = new RelativeLayout.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+
+        relativeLayout.addView(overlayedButton,params_imageview);
+        windowManager.addView(relativeLayout,params);
 
     }
 
@@ -78,124 +117,102 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
         super.onDestroy();
 
         if (overlayedButton != null) {
-
-            windowManager.removeView(overlayedButton);
-            windowManager.removeView(topLeftView);
-            topLeftView=null;
+            windowManager.removeView(relativeLayout);
             overlayedButton = null;
-
         }
 
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
 
     @Override
     public void onClick(View view) {
-//        if (view.isClickable()){
-//            Toast.makeText(this, "yes", Toast.LENGTH_SHORT).show();
-//        }else {
-//            Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
-//        }
-
         showWindow();
     }
 
     private void showWindow() {
 
-        LayoutInflater inflater= (LayoutInflater) getBaseContext()
+        final LayoutInflater inflater= (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         assert inflater != null;
-        @SuppressLint("InflateParams") View popview=inflater.inflate(R.layout.custom_window,null);
+        final View popview=inflater.inflate(R.layout.custom_window,null);
 
-        final PopupWindow popupWindow=new PopupWindow(popview, WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.MATCH_PARENT);
-        popupWindow.update();
+        RelativeLayout.LayoutParams viewParams = new RelativeLayout.LayoutParams(
+                WindowManager.LayoutParams.WRAP_CONTENT,
+                WindowManager.LayoutParams.WRAP_CONTENT);
+        viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL,RelativeLayout.TRUE);
+        viewParams.addRule(RelativeLayout.CENTER_IN_PARENT,RelativeLayout.TRUE);
 
         if (enable){
-            popupWindow.showAsDropDown(overlayedButton,50,-30);
-            Toast.makeText(this, "Show", Toast.LENGTH_SHORT).show();
+            relativeLayout.addView(popview,viewParams);
             enable=false;
         }
 
-        Button button=popview.findViewById(R.id.ok);
-        button.setOnClickListener(new View.OnClickListener() {
+
+        ImageView btnClose=popview.findViewById(R.id.btnClose);
+        btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                popupWindow.dismiss();
+                relativeLayout.removeView(popview);
                 enable=true;
+            }
+        });
+
+        ImageView btnHome=popview.findViewById(R.id.btnHome);
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
+        ImageView btnRecent=popview.findViewById(R.id.btnRecent);
+        btnRecent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
             }
         });
 
         enable=false;
 
-
-//        ArrayList<String> itemTitles = new ArrayList<>();
-//        for(int i = 0 ; i < 6 ; i ++){
-//            itemTitles.add(String.valueOf(i));
-//        }
-//
-//        CircularListView circularListView = popview.findViewById(R.id.my_circular_list_1);
-//        CircularItemAdapter adapter = new CircularItemAdapter(itemTitles,inflater);
-//        circularListView.setOnItemClickListener(new CircularTouchListener.CircularItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int index) {
-//            }
-//        });
-//
-//
-//
-//        View views = inflater.inflate(R.layout.view_circular_item, null);
-//        TextView itemView = (TextView) views.findViewById(R.id.bt_item);
-//        itemView.setText(String.valueOf(adapter.getCount() + 1));*//*
-//        circularListView.setAdapter(adapter);
-//        adapter.addItem(popview);*/
-//
-//       //windowManager.addView(popview,params);
-
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
-        WindowManager.LayoutParams params = (WindowManager.LayoutParams) overlayedButton.getLayoutParams();
+    public boolean onTouch(View view, MotionEvent motionEvent)   {
+        WindowManager.LayoutParams params = (WindowManager.LayoutParams) relativeLayout.getLayoutParams();
 
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
-            float x = motionEvent.getRawX();
-            float y = motionEvent.getRawY();
+            //initial position
+            initialX=params.x;
+            initialY=params.y;
 
-            moving = false;
+            //touch locationn
+            initialTouchX=motionEvent.getRawX();
+            initialTouchY=motionEvent.getRawY();
 
-            int[] location = new int[2];
-            overlayedButton.getLocationOnScreen(location);
-            originalXPos = location[0];
-            originalYPos = location[1];
-
-            offsetX = originalXPos - x;
-            offsetY = originalYPos - y;
+            moving=false;
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
-            int[] topLeftLocationOnScreen = new int[2];
-            topLeftView.getLocationOnScreen(topLeftLocationOnScreen);
+            //calculate x and y coordinate of view
 
-            float x = motionEvent.getRawX();
-            float y = motionEvent.getRawY();
+            params.x=initialX + (int)(motionEvent.getRawX() - initialTouchX);
+            params.y=initialY + (int)(motionEvent.getRawY() - initialTouchY);
 
-            int newX = (int) (offsetX + x);
-            int newY = (int) (offsetY + y);
+            //update the layout
+            windowManager.updateViewLayout(relativeLayout,params);
 
-            if (Math.abs(newX - originalXPos) <=0 && Math.abs(newY - originalYPos) <=0 && !moving) {
+            moving=true;
 
-                return false;
-            }
-
-            params.x = newX - (topLeftLocationOnScreen[0]);
-            params.y = newY - (topLeftLocationOnScreen[1]);
-
-            windowManager.updateViewLayout(overlayedButton, params);
-
-            moving = true;
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
 
@@ -213,68 +230,6 @@ public class MyService extends Service implements View.OnTouchListener, View.OnC
 
     public void setImageIndex(int imageIndex) {
         this.imageIndex = imageIndex;
-    }
-
-    //Added method
-    private void createMtouch(){
-        windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
-
-        overlayedButton = new ImageView(this);
-        overlayedButton.setImageResource(R.mipmap.float_widget);
-        overlayedButton.setOnTouchListener(this);
-        overlayedButton.setOnClickListener(this);
-
-
-        WindowManager.LayoutParams params;
-        // edited code starts from here
-        /*=
-                new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.TYPE_PHONE | WindowManager.LayoutParams.TYPE_TOAST,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE ,
-                        PixelFormat.TRANSLUCENT);
-                        */
-
-        //the added code...
-        // we have to differentiate between the type_phone and the type_application overlay
-        int LAYOUT_FLAG;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            LAYOUT_FLAG = WindowManager.LayoutParams.TYPE_PHONE;
-        }
-
-        params = new WindowManager.LayoutParams(
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                WindowManager.LayoutParams.WRAP_CONTENT,
-                LAYOUT_FLAG,
-                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE | WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                PixelFormat.TRANSLUCENT);
-
-
-        params.gravity = Gravity.START | Gravity.TOP;
-        params.x = 0;
-        params.y = 0;
-
-        windowManager.addView(overlayedButton, params);
-
-
-        topLeftView = new View(this);
-
-        WindowManager.LayoutParams topLeftParams = new WindowManager.LayoutParams
-                (WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.TYPE_PHONE,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
-                                | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL, PixelFormat.TRANSLUCENT);
-
-        topLeftParams.gravity = Gravity.START | Gravity.TOP;
-
-        topLeftParams.x = 0;
-        topLeftParams.y = 0;
-        topLeftParams.width = 0;
-        topLeftParams.height = 0;
-        windowManager.addView(topLeftView, topLeftParams);
     }
 
 }

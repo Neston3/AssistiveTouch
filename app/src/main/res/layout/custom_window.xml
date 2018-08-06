@@ -3,22 +3,64 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!--<com.jh.circularlist.CircularListView
-        android:id="@+id/my_circular_list_1"
-        android:layout_width="300dp"
-        android:layout_height="300dp"/>-->
-
-
-    <Button
-        android:id="@+id/ok"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/ok"/>
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:background="#99000000"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp">
 
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="sfasfsafsdfsad"-->
-        <!--android:textSize="50sp"/>-->
+        <ImageView
+            android:id="@+id/btnHome"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerInParent="true"
+            android:src="@drawable/ic_home_black_24dp" />
+
+        <ImageView
+            android:id="@+id/btnRecent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="50dp"
+            android:layout_toEndOf="@+id/btnHome"
+            android:layout_toRightOf="@+id/btnHome"
+            android:src="@drawable/ic_view_headline_black_24dp" />
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginEnd="40dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginTop="50dp"
+            android:layout_toLeftOf="@+id/btnHome"
+            android:layout_toStartOf="@+id/btnHome"
+            android:src="@drawable/ic_keyboard_arrow_left_black_24dp" />
+
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="50dp"
+            android:src="@drawable/ic_close_black_24dp" />
+
+        <ImageView
+            android:id="@+id/btnSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100dp"
+            android:src="@drawable/ic_settings_black_24dp" />
+
+    </RelativeLayout>
 
 </RelativeLayout>
