@@ -22,7 +22,7 @@
             android:src="@drawable/ic_home_black_24dp" />
 
         <ImageView
-            android:id="@+id/btnRecent"
+            android:id="@+id/btnBluetooth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -31,7 +31,7 @@
             android:layout_marginTop="50dp"
             android:layout_toEndOf="@+id/btnHome"
             android:layout_toRightOf="@+id/btnHome"
-            android:src="@drawable/ic_view_headline_black_24dp" />
+            android:src="@drawable/ic_bluetooth_black_24dp" />
 
         <ImageView
             android:id="@+id/btnBack"

@@ -6,12 +6,62 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="10dp"
+        android:text="Enable MTouch"
+        android:textSize="18sp" />
+
     <Button
-        android:layout_centerInParent="true"
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="set on" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="17dp"
+        android:layout_marginRight="17dp"
+        android:layout_toLeftOf="@+id/text"
+        android:text="ON" />
+
+    <TextView
+        android:id="@+id/instruction"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text"
+        android:layout_marginLeft="14dp"
+        android:layout_marginStart="14dp"
+        android:layout_marginTop="25dp"
+        android:onClick="howToUSe"
+        android:text="How To Use"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/feedback"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="25dp"
+        android:onClick="feedback"
+        android:text="Feedback"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/about"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/feedback"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="25dp"
+        android:onClick="about"
+        android:text="About"
+        android:textSize="18sp" />
 
 
 </RelativeLayout>

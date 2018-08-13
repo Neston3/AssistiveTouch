@@ -4,11 +4,11 @@ import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -17,23 +17,27 @@ public class MainActivity extends AppCompatActivity {
 
     private Button button;
     public final static int REQUEST_CODE = 1234;
-
+    private static final String PREF_NAME="MTouch";
+    private static final String NAME= "set";
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        button=findViewById(R.id.button);
+        checkDrawOverlayPermission();
 
+        button=findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                /* added code
-                method called to check permission
-                 */
-                checkDrawOverlayPermission();
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(MainActivity.this)) {
+                    createRunningService();
+                } else {
+                    Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -43,16 +47,19 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        sharedPreferences = getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(NAME)){
+            String d=sharedPreferences.getString(NAME,"");
+            Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
+        }
+
         boolean getServiceState = isMyServiceRunning();
-
         if (getServiceState) {
-
-            button.setText(R.string.stop);
-
+            button.setText("OFF");
         } else {
-
-            button.setText(R.string.start);
-
+            button.setText("ON");
         }
 
     }
@@ -64,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         if (manager != null) {
             for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
 
-                if (MyService.class.getName().equals(service.service.getClassName())) {
+                if (MTouchService.class.getName().equals(service.service.getClassName())) {
 
                     return true;
 
@@ -76,8 +83,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
 
     }
-
-    //Added methods
 
     public void checkDrawOverlayPermission() {
         /* check if we already  have permission to draw over other apps */
@@ -91,23 +96,21 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
-        createRunningService();
+       // createRunningService();
     }
 
     //Added method
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
-    /* check if received result code
-     is equal our requested code for draw permission  */
+
         if (requestCode == REQUEST_CODE) {
-            /* if so check once again if we have permission */
+            //not set
             if (!Settings.canDrawOverlays(this)) {
-                checkDrawOverlayPermission();
-            }else {
-                createRunningService();
-                Toast.makeText(this, "enabled", Toast.LENGTH_SHORT).show();
+                finish();
             }
+        }else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -115,23 +118,27 @@ public class MainActivity extends AppCompatActivity {
         boolean getServiceState = isMyServiceRunning();
 
         if (getServiceState) {
-
-            stopService(new Intent(MainActivity.this, MyService.class));
-
-            button.setText(R.string.start);
-
-
-
+            stopService(new Intent(MainActivity.this, MTouchService.class));
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.putString(NAME,"off");
+            editor.apply();
+            button.setText("ON");
         } else {
-
-            startService(new Intent(MainActivity.this, MyService.class));
-
-            button.setText(R.string.stop);
-
-
-
+            startService(new Intent(MainActivity.this, MTouchService.class));
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            editor.putString(NAME,"on");
+            editor.apply();
+            button.setText("OFF");
         }
     }
 
 
+    public void howToUSe(View view) {
+    }
+
+    public void feedback(View view) {
+    }
+
+    public void about(View view) {
+    }
 }
