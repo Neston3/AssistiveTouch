@@ -10,6 +10,7 @@ import android.graphics.Point;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import java.util.List;
 
 import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
+import static android.content.ContentValues.TAG;
 
 public class MTouchService extends Service implements View.OnTouchListener, View.OnClickListener {
 
@@ -59,7 +61,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
+        return Service.START_STICKY;
     }
 
     private void createMtouch() {
@@ -250,14 +252,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
         return false;
 
-    }
-
-    public void setImageList(List<Integer> imageList) {
-        this.imageList = imageList;
-    }
-
-    public void setImageIndex(int imageIndex) {
-        this.imageIndex = imageIndex;
     }
 
 }
