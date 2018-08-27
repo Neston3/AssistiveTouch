@@ -10,7 +10,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.maricajr.mtouch.MTouchService;
+import com.maricajr.mtouch.utils.service.MTouchService;
 
 import static android.content.ContentValues.TAG;
 

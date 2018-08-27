@@ -13,6 +13,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.maricajr.mtouch.utils.service.MTouchService;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button button;

@@ -6,7 +6,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 
-import com.maricajr.mtouch.BootReceiver;
+import com.maricajr.mtouch.utils.receiver.BootReceiver;
 
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class TestJobService extends JobService {

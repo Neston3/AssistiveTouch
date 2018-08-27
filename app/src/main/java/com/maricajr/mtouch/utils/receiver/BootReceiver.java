@@ -1,4 +1,4 @@
-package com.maricajr.mtouch;
+package com.maricajr.mtouch.utils.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
