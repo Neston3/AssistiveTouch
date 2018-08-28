@@ -34,7 +34,7 @@
             android:src="@drawable/ic_bluetooth_black_24dp" />
 
         <ImageView
-            android:id="@+id/btnBack"
+            android:id="@+id/btnWifi"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
@@ -43,7 +43,7 @@
             android:layout_marginTop="50dp"
             android:layout_toLeftOf="@+id/btnHome"
             android:layout_toStartOf="@+id/btnHome"
-            android:src="@drawable/ic_keyboard_arrow_left_black_24dp" />
+            android:src="@drawable/ic_wifi_black_24dp" />
 
         <ImageView
             android:id="@+id/btnClose"

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
+import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -156,6 +157,13 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             enable = false;
         }
 
+        settingButton(popview);
+
+        enable = false;
+
+    }
+
+    private void settingButton(final View popview) {
 
         ImageView btnClose = popview.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
@@ -179,8 +187,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             }
         });
 
-        ImageView btnRecent = popview.findViewById(R.id.btnBluetooth);
-        btnRecent.setOnClickListener(new View.OnClickListener() {
+        ImageView btnBluetooth = popview.findViewById(R.id.btnBluetooth);
+        btnBluetooth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 enableBluetooth();
@@ -189,8 +197,31 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             }
         });
 
-        enable = false;
+        ImageView btnWifi=popview.findViewById(R.id.btnWifi);
+        btnWifi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                enableWiFi();
+                relativeLayout.removeView(popview);
+                enable = true;
 
+            }
+        });
+
+    }
+
+    private void enableWiFi() {
+        WifiManager wifiManager = (WifiManager)getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+
+        assert wifiManager != null;
+        boolean wifiEnabled = wifiManager.isWifiEnabled();
+
+        if (wifiEnabled){
+            wifiManager.setWifiEnabled(false);
+        }else {
+            wifiManager.setWifiEnabled(true);
+        }
     }
 
     private void enableBluetooth() {
@@ -253,5 +284,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         return false;
 
     }
+
+
 
 }
