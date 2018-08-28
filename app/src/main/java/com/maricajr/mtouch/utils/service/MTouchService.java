@@ -222,7 +222,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             initialTouchX = motionEvent.getRawX();
             initialTouchY = motionEvent.getRawY();
 
-            moving = false;
+            return moving;
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
@@ -234,7 +234,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             //update the layout
             windowManager.updateViewLayout(relativeLayout, params);
 
-            moving = true;
+            moving = false;
 
 
         } else if (motionEvent.getAction() == MotionEvent.ACTION_UP) {

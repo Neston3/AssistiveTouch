@@ -6,6 +6,7 @@ import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
@@ -13,6 +14,8 @@ import android.util.Log;
 import com.maricajr.mtouch.utils.service.MTouchService;
 
 import static android.content.ContentValues.TAG;
+import static com.maricajr.mtouch.StringUtil.NAME;
+import static com.maricajr.mtouch.StringUtil.PREF_NAME;
 
 public class Util {
 
@@ -29,10 +32,24 @@ public class Util {
         JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
         assert jobScheduler != null;
         jobScheduler.schedule(builder.build());
-        Intent mfloat=new Intent(context, MTouchService.class);
-        context.startService(mfloat);
-        Log.i(TAG, "scheduleJob: started");
+
+
+        checkIfrunningAfterBoot(context);
+
     }
 
+    private static void checkIfrunningAfterBoot(Context context) {
+        SharedPreferences sharedPreferences;
+        sharedPreferences=context.getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(NAME)){
+            String d=sharedPreferences.getString(NAME,"");
+            if (d.contains("on")){
+                Intent mfloat=new Intent(context, MTouchService.class);
+                context.startService(mfloat);
+            }else {
+                Log.i(TAG, "scheduleJob: shared preference is OFF");
+            }
+        }
+    }
 
 }

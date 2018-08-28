@@ -9,19 +9,21 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
 import com.maricajr.mtouch.utils.service.MTouchService;
 
+import static com.maricajr.mtouch.StringUtil.NAME;
+import static com.maricajr.mtouch.StringUtil.PREF_NAME;
+import static com.maricajr.mtouch.StringUtil.REQUEST_CODE;
+
 public class MainActivity extends AppCompatActivity {
 
     private Button button;
-    public final static int REQUEST_CODE = 1234;
-    private static final String PREF_NAME="MTouch";
-    private static final String NAME= "set";
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

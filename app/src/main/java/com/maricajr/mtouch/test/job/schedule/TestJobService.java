@@ -13,6 +13,7 @@ public class TestJobService extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
+        //it has no use....check it once more
         Intent service = new Intent(getApplicationContext(), BootReceiver.class);
         getApplicationContext().startService(service);
         // reschedule the job
