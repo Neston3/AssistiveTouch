@@ -2,19 +2,28 @@ package com.maricajr.mtouch;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.maricajr.mtouch.utils.service.MTouchService;
+
+import java.util.Objects;
 
 import static com.maricajr.mtouch.StringUtil.NAME;
 import static com.maricajr.mtouch.StringUtil.PREF_NAME;
@@ -24,11 +33,14 @@ public class MainActivity extends AppCompatActivity {
 
     private Button button;
     private SharedPreferences sharedPreferences;
+    private Dialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        dialog=new Dialog(this);
 
         checkDrawOverlayPermission();
 
@@ -54,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE);
         if (sharedPreferences.contains(NAME)){
             String d=sharedPreferences.getString(NAME,"");
-            Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
         }else {
-            Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
         }
 
         boolean getServiceState = isMyServiceRunning();
@@ -136,13 +148,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    public void howToUSe(View view) {
-    }
-
     public void feedback(View view) {
+
+        Toast.makeText(this, "feedback", Toast.LENGTH_SHORT).show();
     }
 
-    public void about(View view) {
+    public void aboutus(View view) {
+        Toast.makeText(this, "aboutus", Toast.LENGTH_SHORT).show();
+    }
+
+    public void howToUse(View view) {
+//        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        Objects.requireNonNull(dialog.getWindow())
+                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.how_to_use_popup);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+    }
+
+    public void close_pop(View view) {
+        dialog.dismiss();
     }
 }

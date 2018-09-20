@@ -22,6 +22,7 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.maricajr.mtouch.MainActivity;
 import com.maricajr.mtouch.R;
 
 import java.util.List;
@@ -71,7 +72,10 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
 
         overlayedButton = new ImageView(this);
-        overlayedButton.setImageResource(R.mipmap.float_widget);
+        overlayedButton.setImageResource(R.drawable.ic_radio_button_checked_black_24dp);
+        //overlayedButton.setAlpha(0.5f);
+        /*overlayedButton.setMaxWidth();
+        overlayedButton.setMaxHeight();*/
         overlayedButton.setOnTouchListener(this);
         overlayedButton.setOnClickListener(this);
 
@@ -208,6 +212,18 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             }
         });
 
+        ImageView btnSetting=popview.findViewById(R.id.btnSetting);
+        btnSetting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(getApplicationContext(), MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                relativeLayout.removeView(popview);
+                enable = true;
+            }
+        });
+
     }
 
     private void enableWiFi() {
@@ -236,7 +252,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             }
         }
     }
-
 
     @SuppressLint("ClickableViewAccessibility")
     @Override

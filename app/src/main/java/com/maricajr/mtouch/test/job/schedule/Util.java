@@ -18,23 +18,25 @@ import static com.maricajr.mtouch.StringUtil.NAME;
 import static com.maricajr.mtouch.StringUtil.PREF_NAME;
 
 public class Util {
+    private static final long REFRESH_INTERVAL  = 5 * 1000; // 5 seconds
 
-    @TargetApi(Build.VERSION_CODES.M)
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public static void scheduleJob(Context context) {
-        ComponentName serviceComponent = new ComponentName(context, TestJobService.class);
-        JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
-        builder.setMinimumLatency(1000); // wait at least
-        builder.setOverrideDeadline(3 * 1000); // maximum delay
-        //builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
-        //builder.setRequiresDeviceIdle(true); // device should be idle
-        //builder.setRequiresCharging(false); // we don't care if the device is charging or not
-        JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
-        assert jobScheduler != null;
-        jobScheduler.schedule(builder.build());
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
+            ComponentName serviceComponent = new ComponentName(context, TestJobService.class);
+            JobInfo.Builder builder = new JobInfo.Builder(0, serviceComponent);
+            builder.setMinimumLatency(1000); //wait at least 1 sec
+            builder.setPeriodic(REFRESH_INTERVAL);
+            builder.setOverrideDeadline(3 * 1000); // maximum delay 3 sec
+            /*builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_UNMETERED); // require unmetered network
+            builder.setRequiresDeviceIdle(true); // device should be idle
+            */builder.setRequiresCharging(false); // we don't care if the device is charging or not
+            JobScheduler jobScheduler = context.getSystemService(JobScheduler.class);
+            assert jobScheduler != null;
+            jobScheduler.schedule(builder.build());
 
 
-        checkIfrunningAfterBoot(context);
+            checkIfrunningAfterBoot(context);
+        }
 
     }
 
