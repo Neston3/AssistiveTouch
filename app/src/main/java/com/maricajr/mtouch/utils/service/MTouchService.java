@@ -152,6 +152,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
     }
 
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();

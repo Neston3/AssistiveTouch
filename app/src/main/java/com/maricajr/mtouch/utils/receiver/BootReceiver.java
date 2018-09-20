@@ -16,7 +16,7 @@ import com.maricajr.mtouch.utils.service.MTouchService;
 import static android.content.ContentValues.TAG;
 
 public class BootReceiver extends BroadcastReceiver {
-    //@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onReceive(Context context, Intent intent) {
 
