@@ -1,16 +1,21 @@
 package com.maricajr.mtouch.utils.service;
 
 import android.annotation.SuppressLint;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,6 +33,7 @@ import com.maricajr.mtouch.R;
 import java.util.List;
 
 import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
+import static android.content.ContentValues.TAG;
 
 public class MTouchService extends Service implements View.OnTouchListener, View.OnClickListener {
 
@@ -63,7 +69,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        return Service.START_STICKY;
+        return START_STICKY;
     }
 
     private void createMtouch() {
@@ -125,6 +131,25 @@ public class MTouchService extends Service implements View.OnTouchListener, View
                 mWidth = size.x - width;
             }
         });
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+
+        Intent restartServiceIntent = new Intent(getApplicationContext(),
+                this.getClass());
+        restartServiceIntent.setPackage(getPackageName());
+
+        PendingIntent restartServicePendingIntent = PendingIntent.getService(
+                getApplicationContext(), 1, restartServiceIntent,
+                PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmService = (AlarmManager) getApplicationContext()
+                .getSystemService(Context.ALARM_SERVICE);
+        alarmService.set(AlarmManager.ELAPSED_REALTIME,
+                SystemClock.elapsedRealtime() + 1000,
+                restartServicePendingIntent);
+
     }
 
     @Override

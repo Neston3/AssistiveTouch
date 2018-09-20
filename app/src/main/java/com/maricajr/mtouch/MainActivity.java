@@ -2,10 +2,14 @@ package com.maricajr.mtouch;
 
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -21,10 +25,12 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.maricajr.mtouch.utils.receiver.BootReceiver;
 import com.maricajr.mtouch.utils.service.MTouchService;
 
 import java.util.Objects;
 
+import static android.content.ContentValues.TAG;
 import static com.maricajr.mtouch.StringUtil.NAME;
 import static com.maricajr.mtouch.StringUtil.PREF_NAME;
 import static com.maricajr.mtouch.StringUtil.REQUEST_CODE;
@@ -74,8 +80,10 @@ public class MainActivity extends AppCompatActivity {
         boolean getServiceState = isMyServiceRunning();
         if (getServiceState) {
             button.setText("OFF");
+            startService(new Intent(MainActivity.this, MTouchService.class));
         } else {
             button.setText("ON");
+            stopService(new Intent(MainActivity.this, MTouchService.class));
         }
 
     }
@@ -115,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
        // createRunningService();
     }
 
-    //Added method
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
