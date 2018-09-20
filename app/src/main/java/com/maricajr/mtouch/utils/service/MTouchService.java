@@ -7,7 +7,6 @@ import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ServiceInfo;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
 import android.net.wifi.WifiManager;
@@ -15,7 +14,6 @@ import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -33,7 +31,6 @@ import com.maricajr.mtouch.R;
 import java.util.List;
 
 import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
-import static android.content.ContentValues.TAG;
 
 public class MTouchService extends Service implements View.OnTouchListener, View.OnClickListener {
 
@@ -78,8 +75,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
 
         overlayedButton = new ImageView(this);
-        overlayedButton.setImageResource(R.drawable.ic_radio_button_checked_black_24dp);
-        //overlayedButton.setAlpha(0.5f);
+        overlayedButton.setImageResource(R.drawable.drawble_icon);
+        overlayedButton.setAlpha(0.7f);
         /*overlayedButton.setMaxWidth();
         overlayedButton.setMaxHeight();*/
         overlayedButton.setOnTouchListener(this);
