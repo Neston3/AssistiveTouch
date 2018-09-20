@@ -136,7 +136,10 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
+        restartService();
+    }
 
+    private void restartService() {
         Intent restartServiceIntent = new Intent(getApplicationContext(),
                 this.getClass());
         restartServiceIntent.setPackage(getPackageName());
@@ -151,8 +154,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
                 restartServicePendingIntent);
 
     }
-
-
 
     @Override
     public void onDestroy() {

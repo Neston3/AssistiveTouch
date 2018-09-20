@@ -92,7 +92,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        restartService();
 
+    }
+
+    private void restartService() {
         Intent restartServiceIntent = new Intent(getApplicationContext(),
                 MTouchService.class);
         restartServiceIntent.setPackage(getPackageName());
@@ -105,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         alarmService.set(AlarmManager.ELAPSED_REALTIME,
                 SystemClock.elapsedRealtime() + 1000,
                 restartServicePendingIntent);
-
     }
 
     private boolean isMyServiceRunning() {
