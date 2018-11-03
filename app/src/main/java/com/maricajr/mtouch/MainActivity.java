@@ -5,11 +5,9 @@ import android.app.ActivityManager;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -17,21 +15,14 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
-import android.widget.PopupWindow;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.maricajr.mtouch.utils.receiver.BootReceiver;
 import com.maricajr.mtouch.utils.service.MTouchService;
 
 import java.util.Objects;
 
-import static android.content.ContentValues.TAG;
 import static com.maricajr.mtouch.StringUtil.NAME;
 import static com.maricajr.mtouch.StringUtil.PREF_NAME;
 import static com.maricajr.mtouch.StringUtil.REQUEST_CODE;
@@ -74,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
         if (sharedPreferences.contains(NAME)){
             String d=sharedPreferences.getString(NAME,"");
             //Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
-        }else {
-            //Toast.makeText(this, "no", Toast.LENGTH_SHORT).show();
         }
 
         boolean getServiceState = isMyServiceRunning();
@@ -92,7 +81,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        restartService();
+        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(NAME)) {
+            String d = sharedPreferences.getString(NAME, "");
+            restartService();
+            //Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
+        }
 
     }
 

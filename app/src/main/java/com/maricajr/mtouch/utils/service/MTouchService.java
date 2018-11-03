@@ -1,18 +1,14 @@
 package com.maricajr.mtouch.utils.service;
 
 import android.annotation.SuppressLint;
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
-import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.view.Display;
 import android.view.Gravity;
@@ -25,41 +21,40 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.maricajr.mtouch.MainActivity;
 import com.maricajr.mtouch.R;
+import com.maricajr.mtouch.utils.SettingButton;
 
-import java.util.List;
-
-import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
+import static com.maricajr.mtouch.StringUtil.NAME;
 
 public class MTouchService extends Service implements View.OnTouchListener, View.OnClickListener {
 
     private RelativeLayout relativeLayout;
-    private View topLeftView;
     private ImageView overlayedButton;
     private boolean moving;
     private WindowManager windowManager;
-    private Boolean enable = true;
-    List<Integer> imageList;
-    int imageIndex;
-    private boolean active;
     private int initialX;
     private int initialY;
     private float initialTouchX;
     private float initialTouchY;
     private int mWidth;
     private static final String PREF_NAME="MTouch";
+    SharedPreferences sharedPreferences;
+    private SettingButton settingButton;
+    private RestartService restartService;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        enable = false;
+        settingButton.setEnable(false);
         return null;
     }
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate() {
+        restartService = new RestartService(this);
+        settingButton = new SettingButton(this);
+        settingButton.setEnable(true);
         createMtouch();
         super.onCreate();
     }
@@ -77,8 +72,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         overlayedButton = new ImageView(this);
         overlayedButton.setImageResource(R.drawable.drawble_icon);
         overlayedButton.setAlpha(0.7f);
-        /*overlayedButton.setMaxWidth();
-        overlayedButton.setMaxHeight();*/
         overlayedButton.setOnTouchListener(this);
         overlayedButton.setOnClickListener(this);
 
@@ -109,7 +102,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         windowManager.addView(relativeLayout, params);
 
         getScreenWidth();
-
     }
 
     private void getScreenWidth() {
@@ -133,23 +125,13 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
-        restartService();
-    }
-
-    private void restartService() {
-        Intent restartServiceIntent = new Intent(getApplicationContext(),
-                this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-
-        PendingIntent restartServicePendingIntent = PendingIntent.getService(
-                getApplicationContext(), 1, restartServiceIntent,
-                PendingIntent.FLAG_ONE_SHOT);
-        AlarmManager alarmService = (AlarmManager) getApplicationContext()
-                .getSystemService(Context.ALARM_SERVICE);
-        alarmService.set(AlarmManager.ELAPSED_REALTIME,
-                SystemClock.elapsedRealtime() + 1000,
-                restartServicePendingIntent);
-
+        sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        if (sharedPreferences.contains(NAME)) {
+            String d = sharedPreferences.getString(NAME, "");
+            restartService.restart();
+        } else {
+            Toast.makeText(this, "Oop!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -181,101 +163,15 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
-        if (enable) {
+        if (settingButton.isEnable()) {
+            settingButton = new SettingButton(popview, relativeLayout, this);
             relativeLayout.addView(popview, viewParams);
-            enable = false;
+            settingButton.setEnable(false);
         }
 
-        settingButton(popview);
+        settingButton.settingButton();
+        settingButton.setEnable(false);
 
-        enable = false;
-
-    }
-
-    private void settingButton(final View popview) {
-
-        ImageView btnClose = popview.findViewById(R.id.btnClose);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                relativeLayout.removeView(popview);
-                enable = true;
-            }
-        });
-
-        ImageView btnHome = popview.findViewById(R.id.btnHome);
-        btnHome.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(Intent.ACTION_MAIN);
-                intent.addCategory(Intent.CATEGORY_HOME);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                relativeLayout.removeView(popview);
-                enable = true;
-            }
-        });
-
-        ImageView btnBluetooth = popview.findViewById(R.id.btnBluetooth);
-        btnBluetooth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                enableBluetooth();
-                relativeLayout.removeView(popview);
-                enable = true;
-            }
-        });
-
-        ImageView btnWifi=popview.findViewById(R.id.btnWifi);
-        btnWifi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                enableWiFi();
-                relativeLayout.removeView(popview);
-                enable = true;
-
-            }
-        });
-
-        ImageView btnSetting=popview.findViewById(R.id.btnSetting);
-        btnSetting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent=new Intent(getApplicationContext(), MainActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                relativeLayout.removeView(popview);
-                enable = true;
-            }
-        });
-
-    }
-
-    private void enableWiFi() {
-        WifiManager wifiManager = (WifiManager)getApplicationContext()
-                .getSystemService(Context.WIFI_SERVICE);
-
-        assert wifiManager != null;
-        boolean wifiEnabled = wifiManager.isWifiEnabled();
-
-        if (wifiEnabled){
-            wifiManager.setWifiEnabled(false);
-        }else {
-            wifiManager.setWifiEnabled(true);
-        }
-    }
-
-    private void enableBluetooth() {
-        BluetoothAdapter bluetoothAdapter=getDefaultAdapter();
-        if (bluetoothAdapter == null){
-            Toast.makeText(this, "disabled", Toast.LENGTH_SHORT).show();
-        }else {
-            if (bluetoothAdapter.isEnabled()){
-                bluetoothAdapter.disable();
-            }else {
-                bluetoothAdapter.enable();
-            }
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -324,7 +220,5 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         return false;
 
     }
-
-
 
 }
