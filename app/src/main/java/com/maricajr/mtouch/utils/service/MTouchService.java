@@ -41,7 +41,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     SharedPreferences sharedPreferences;
     private SettingButton settingButton;
     private RestartService restartService;
-
+    private View tempoView;
+/// find a way to get rid of tempoview
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -181,6 +182,13 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     @Override
     public void onClick(View view) {
         showWindow();
+//
+//        if(settingButton.isEnable()){
+//            showWindow();
+//        } else {
+//            relativeLayout.removeView(tempoView);
+//            settingButton.setEnable(true);
+//        }
     }
 
     private void showWindow() {
@@ -205,12 +213,17 @@ public class MTouchService extends Service implements View.OnTouchListener, View
              * together with its
              * viewparams
              * to the main relative layout*/
-            relativeLayout.addView(popview, viewParams);
+            relativeLayout.addView( popview, viewParams);
+            tempoView = popview;
             settingButton.setEnable(false);
+            settingButton.settingButton();
+            settingButton.setEnable(false);
+
+        } else {
+            relativeLayout.removeView( tempoView);
+            settingButton.setEnable(true);
         }
 
-        settingButton.settingButton();
-        settingButton.setEnable(false);
 
     }
 

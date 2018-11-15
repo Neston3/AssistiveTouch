@@ -19,7 +19,7 @@ public class SettingButton {
     private View popview;
     private RelativeLayout relativeLayout;
     private Context context;
-    private boolean enable;
+    private boolean enable = false;
 
     public SettingButton(View popview, RelativeLayout relativeLayout, Context context) {
         this.popview = popview;
