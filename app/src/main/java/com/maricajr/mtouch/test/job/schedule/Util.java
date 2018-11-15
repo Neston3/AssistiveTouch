@@ -1,14 +1,11 @@
 package com.maricajr.mtouch.test.job.schedule;
 
-import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.maricajr.mtouch.utils.service.MTouchService;
@@ -18,8 +15,12 @@ import static com.maricajr.mtouch.StringUtil.NAME;
 import static com.maricajr.mtouch.StringUtil.PREF_NAME;
 
 public class Util {
-    private static final long REFRESH_INTERVAL  = 5 * 1000; // 5 seconds
+    private static final long REFRESH_INTERVAL = 5 * 1000;
 
+    /*Jobschedule
+     * to make a continous
+     * running
+     * service*/
     public static void scheduleJob(Context context) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M){
             ComponentName serviceComponent = new ComponentName(context, TestJobService.class);
@@ -40,6 +41,9 @@ public class Util {
 
     }
 
+    /*check if the service is running
+     * after reboot or boot
+     * and restart it if it was enabled */
     private static void checkIfrunningAfterBoot(Context context) {
         SharedPreferences sharedPreferences;
         sharedPreferences=context.getSharedPreferences(PREF_NAME,Context.MODE_PRIVATE);

@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+/*unused class*/
 public class RateUs {
     // Insert your Application Title
     private final static String TITLE = "Assistive Touch";

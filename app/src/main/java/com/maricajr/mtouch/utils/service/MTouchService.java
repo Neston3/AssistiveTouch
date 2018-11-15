@@ -52,9 +52,16 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     @SuppressLint("ClickableViewAccessibility")
     @Override
     public void onCreate() {
+        /*initializing  restart service
+         * and
+         * floating settingButton classes*/
         restartService = new RestartService(this);
         settingButton = new SettingButton(this);
         settingButton.setEnable(true);
+        /*
+         * create
+         * the
+         * floating touch*/
         createMtouch();
         super.onCreate();
     }
@@ -66,9 +73,15 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
     private void createMtouch() {
 
+        /*windowmanager
+         * to allow
+         * drawing on the screen*/
         windowManager = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
 
-
+        /*initializing
+         * imageview
+         * to be displayed
+         * and giving it params*/
         overlayedButton = new ImageView(this);
         overlayedButton.setImageResource(R.drawable.drawble_icon);
         overlayedButton.setAlpha(0.7f);
@@ -77,11 +90,17 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
 
         int LAYOUT_PARAMS;
+        /*The type of windowmanager to be used
+         * depending on the
+         * android version*/
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             LAYOUT_PARAMS = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
         } else {
             LAYOUT_PARAMS = WindowManager.LayoutParams.TYPE_PHONE;
         }
+
+        /*setting
+         *Windowmanager params*/
         WindowManager.LayoutParams params =
                 new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
                         WindowManager.LayoutParams.WRAP_CONTENT,
@@ -93,14 +112,20 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         params.x = 0;
         params.y = 0;
 
+        /*relative layout getting the params of windowmanager*/
         relativeLayout = new RelativeLayout(this);
         RelativeLayout.LayoutParams params_imageview = new RelativeLayout.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
 
+        /*adding view to the relative layout*/
         relativeLayout.addView(overlayedButton, params_imageview);
+        /*adding
+         * the
+         * relative layout inside the windowmanager*/
         windowManager.addView(relativeLayout, params);
 
+        /*get screen width */
         getScreenWidth();
     }
 
@@ -125,9 +150,15 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         super.onTaskRemoved(rootIntent);
+        /*on clearing recent apps
+         * check if the service prefernce
+         * was saved then restart it*/
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         if (sharedPreferences.contains(NAME)) {
-            String d = sharedPreferences.getString(NAME, "");
+            //String d = sharedPreferences.getString(NAME, "");
+
+            /*
+             * restart the service*/
             restartService.restart();
         } else {
             Toast.makeText(this, "Oop!", Toast.LENGTH_SHORT).show();
@@ -145,6 +176,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
     }
 
+    /*onclick
+     * show the menu*/
     @Override
     public void onClick(View view) {
         showWindow();
@@ -152,11 +185,14 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
     private void showWindow() {
 
+        /*inflate the layout*/
         final LayoutInflater inflater = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         assert inflater != null;
         final View popview = inflater.inflate(R.layout.custom_window, null);
 
+        /*relative layout for the menu getting the params of windowmanager
+         * and adding rules*/
         RelativeLayout.LayoutParams viewParams = new RelativeLayout.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
@@ -165,6 +201,10 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
         if (settingButton.isEnable()) {
             settingButton = new SettingButton(popview, relativeLayout, this);
+            /*adding the popview menu
+             * together with its
+             * viewparams
+             * to the main relative layout*/
             relativeLayout.addView(popview, viewParams);
             settingButton.setEnable(false);
         }

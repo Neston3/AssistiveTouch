@@ -93,28 +93,29 @@ public class MainActivity extends AppCompatActivity {
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         if (sharedPreferences.contains(NAME)) {
             String d = sharedPreferences.getString(NAME, "");
-            restartService();
+            restart();
             //Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    private void restartService() {
-
-        /*get the intent package name of the service*/
-        Intent restartServiceIntent = new Intent(getApplicationContext(),
+    public void restart() {
+        /*get the intent to be restarted */
+        Intent restartServiceIntent = new Intent(this,
                 MTouchService.class);
-        restartServiceIntent.setPackage(getPackageName());
+        restartServiceIntent.setPackage(String.valueOf(getApplicationContext()));
 
-        /*restart the service */
         PendingIntent restartServicePendingIntent = PendingIntent.getService(
                 getApplicationContext(), 1, restartServiceIntent,
                 PendingIntent.FLAG_ONE_SHOT);
+        /*Alam manager to restart the service
+         * whenever it is closed*/
         AlarmManager alarmService = (AlarmManager) getApplicationContext()
                 .getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME,
                 SystemClock.elapsedRealtime() + 1000,
                 restartServicePendingIntent);
+
     }
 
     /*check if my service is running

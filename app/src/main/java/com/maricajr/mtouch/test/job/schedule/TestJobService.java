@@ -11,6 +11,7 @@ import com.maricajr.mtouch.utils.receiver.BootReceiver;
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class TestJobService extends JobService {
 
+    /*on job started */
     @Override
     public boolean onStartJob(JobParameters jobParameters) {
         //it has no use....check it once more

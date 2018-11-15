@@ -14,6 +14,7 @@ public class RestartService {
     }
 
     public void restart() {
+        /*get the intent to be restarted */
         Intent restartServiceIntent = new Intent(context.getApplicationContext(),
                 this.getClass());
         restartServiceIntent.setPackage(context.getPackageName());
@@ -21,6 +22,8 @@ public class RestartService {
         PendingIntent restartServicePendingIntent = PendingIntent.getService(
                 context.getApplicationContext(), 1, restartServiceIntent,
                 PendingIntent.FLAG_ONE_SHOT);
+        /*Alam manager to restart the service
+         * whenever it is closed*/
         AlarmManager alarmService = (AlarmManager) context.getApplicationContext()
                 .getSystemService(Context.ALARM_SERVICE);
         alarmService.set(AlarmManager.ELAPSED_REALTIME,

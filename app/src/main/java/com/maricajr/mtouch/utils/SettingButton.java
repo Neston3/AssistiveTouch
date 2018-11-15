@@ -14,6 +14,7 @@ import com.maricajr.mtouch.R;
 
 import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
 
+/*menu button class*/
 public class SettingButton {
     private View popview;
     private RelativeLayout relativeLayout;
@@ -32,6 +33,9 @@ public class SettingButton {
 
     public void settingButton() {
 
+        /*each button with
+         * its
+         * functionality*/
         ImageView btnClose = popview.findViewById(R.id.btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
