@@ -1,5 +1,6 @@
 package com.maricajr.mtouch;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.AlarmManager;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
         dialog=new Dialog(this);
 
+        /*checking floating or overlay permission*/
         checkDrawOverlayPermission();
 
         button=findViewById(R.id.button);
@@ -48,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(MainActivity.this)) {
+                    /*create a lifetime running service*/
                     createRunningService();
                 } else {
                     Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(this, d, Toast.LENGTH_SHORT).show();
         }
 
+        /* check if the service is on or off on resume and change the text on the button*/
         boolean getServiceState = isMyServiceRunning();
         if (getServiceState) {
             button.setText("OFF");
@@ -81,6 +85,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        /*check the state of the floating window if on or off
+         * and
+         * restart the service if off
+         * unless its already off
+         * */
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         if (sharedPreferences.contains(NAME)) {
             String d = sharedPreferences.getString(NAME, "");
@@ -91,10 +100,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void restartService() {
+
+        /*get the intent package name of the service*/
         Intent restartServiceIntent = new Intent(getApplicationContext(),
                 MTouchService.class);
         restartServiceIntent.setPackage(getPackageName());
 
+        /*restart the service */
         PendingIntent restartServicePendingIntent = PendingIntent.getService(
                 getApplicationContext(), 1, restartServiceIntent,
                 PendingIntent.FLAG_ONE_SHOT);
@@ -105,26 +117,22 @@ public class MainActivity extends AppCompatActivity {
                 restartServicePendingIntent);
     }
 
+    /*check if my service is running
+     * */
     private boolean isMyServiceRunning() {
-
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-
         if (manager != null) {
             for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-
                 if (MTouchService.class.getName().equals(service.service.getClassName())) {
-
                     return true;
-
                 }
-
             }
         }
-
         return false;
-
     }
 
+    /*floating/overlayed permission request
+     * */
     public void checkDrawOverlayPermission() {
         /* check if we already  have permission to draw over other apps */
 
@@ -137,13 +145,14 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }
-       // createRunningService();
+        // createRunningService();
     }
 
     @TargetApi(Build.VERSION_CODES.M)
     @Override
     protected void onActivityResult(int requestCode, int resultCode,  Intent data) {
 
+        /*request permission if granted or not*/
         if (requestCode == REQUEST_CODE) {
             //not set
             if (!Settings.canDrawOverlays(this)) {
@@ -154,9 +163,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("ResourceAsColor")
     protected void createRunningService(){
         boolean getServiceState = isMyServiceRunning();
-
+        /*check the state of the service if running or not
+         * */
         if (getServiceState) {
             stopService(new Intent(MainActivity.this, MTouchService.class));
             SharedPreferences.Editor editor=sharedPreferences.edit();
@@ -173,12 +184,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void feedback(View view) {
-
-        Toast.makeText(this, "feedback", Toast.LENGTH_SHORT).show();
+        Objects.requireNonNull(dialog.getWindow())
+                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.feed_back);
+        dialog.show();
     }
 
     public void aboutus(View view) {
-        Toast.makeText(this, "aboutus", Toast.LENGTH_SHORT).show();
+        Objects.requireNonNull(dialog.getWindow())
+                .setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setContentView(R.layout.about_us);
+        dialog.show();
     }
 
     public void howToUse(View view) {
