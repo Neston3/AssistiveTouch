@@ -28,6 +28,7 @@ import static com.maricajr.mtouch.StringUtil.NAME;
 
 public class MTouchService extends Service implements View.OnTouchListener, View.OnClickListener {
 
+    private RelativeLayout.LayoutParams params_imageview;
     private RelativeLayout relativeLayout;
     private ImageView overlayedButton;
     private boolean moving;
@@ -42,6 +43,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     private SettingButton settingButton;
     private RestartService restartService;
     private View tempoView;
+    private final int btnOverlay = View.generateViewId();
 /// find a way to get rid of tempoview
     @Nullable
     @Override
@@ -85,6 +87,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
          * and giving it params*/
         overlayedButton = new ImageView(this);
         overlayedButton.setImageResource(R.drawable.drawble_icon);
+        //setting id for the overlay button
+        overlayedButton.setId(btnOverlay);
         overlayedButton.setAlpha(0.7f);
         overlayedButton.setOnTouchListener(this);
         overlayedButton.setOnClickListener(this);
@@ -103,7 +107,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         /*setting
          *Windowmanager params*/
         WindowManager.LayoutParams params =
-                new WindowManager.LayoutParams(WindowManager.LayoutParams.WRAP_CONTENT,
+                new WindowManager.LayoutParams(
+                        WindowManager.LayoutParams.WRAP_CONTENT,
                         WindowManager.LayoutParams.WRAP_CONTENT,
                         LAYOUT_PARAMS,
                         WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
@@ -115,10 +120,11 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
         /*relative layout getting the params of windowmanager*/
         relativeLayout = new RelativeLayout(this);
-        RelativeLayout.LayoutParams params_imageview = new RelativeLayout.LayoutParams(
+        params_imageview = new RelativeLayout.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
 
+        params_imageview.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
         /*adding view to the relative layout*/
         relativeLayout.addView(overlayedButton, params_imageview);
         /*adding
@@ -182,13 +188,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     @Override
     public void onClick(View view) {
         showWindow();
-//
-//        if(settingButton.isEnable()){
-//            showWindow();
-//        } else {
-//            relativeLayout.removeView(tempoView);
-//            settingButton.setEnable(true);
-//        }
     }
 
     private void showWindow() {
@@ -197,15 +196,22 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         final LayoutInflater inflater = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         assert inflater != null;
-        final View popview = inflater.inflate(R.layout.custom_window, null);
+        final View popview = inflater.inflate(R.layout.custom_window_alternative, null);
 
         /*relative layout for the menu getting the params of windowmanager
          * and adding rules*/
         RelativeLayout.LayoutParams viewParams = new RelativeLayout.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
-        viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-        viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
+//        viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+//        viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        viewParams.addRule(RelativeLayout.ALIGN_LEFT, RelativeLayout.TRUE);
+//        viewParams.addRule(RelativeLayout.LEFT_OF, btnOverlay);
+        params_imageview.addRule(RelativeLayout.LEFT_OF, R.id.caLayout);
+
+
+
 
         if (settingButton.isEnable()) {
             settingButton = new SettingButton(popview, relativeLayout, this);
@@ -213,6 +219,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
              * together with its
              * viewparams
              * to the main relative layout*/
+            relativeLayout.updateViewLayout(overlayedButton, params_imageview);
+            //relativeLayout.removeView(overlayedButton);
             relativeLayout.addView( popview, viewParams);
             tempoView = popview;
             settingButton.setEnable(false);
@@ -220,6 +228,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             settingButton.setEnable(false);
 
         } else {
+            params_imageview.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT);
             relativeLayout.removeView( tempoView);
             settingButton.setEnable(true);
         }
