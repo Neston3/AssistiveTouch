@@ -5,9 +5,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.PixelFormat;
 import android.graphics.Point;
-import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.Display;
@@ -23,6 +21,7 @@ import android.widget.Toast;
 
 import com.maricajr.mtouch.R;
 import com.maricajr.mtouch.utils.SettingButton;
+import com.maricajr.mtouch.utils.paramsInnitializer;
 
 import static com.maricajr.mtouch.StringUtil.NAME;
 
@@ -44,6 +43,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     private RestartService restartService;
     private View tempoView;
     private final int btnOverlay = View.generateViewId();
+    private static paramsInnitializer paramsInnitializer = new paramsInnitializer();
 /// find a way to get rid of tempoview
     @Nullable
     @Override
@@ -94,29 +94,15 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         overlayedButton.setOnClickListener(this);
 
 
-        int LAYOUT_PARAMS;
-        /*The type of windowmanager to be used
-         * depending on the
-         * android version*/
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            LAYOUT_PARAMS = WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY;
-        } else {
-            LAYOUT_PARAMS = WindowManager.LayoutParams.TYPE_PHONE;
-        }
 
         /*setting
          *Windowmanager params*/
-        WindowManager.LayoutParams params =
-                new WindowManager.LayoutParams(
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        LAYOUT_PARAMS,
-                        WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-                        PixelFormat.TRANSLUCENT);
+//        paramsInnitializer paramsInnitializer = new paramsInnitializer();
 
+        paramsInnitializer.setxCoordinate(0);
+        paramsInnitializer.setyCoordinate(150);
+        WindowManager.LayoutParams params = paramsInnitializer.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
         params.gravity = Gravity.START | Gravity.TOP;
-        params.x = 0;
-        params.y = 0;
 
         /*relative layout getting the params of windowmanager*/
         relativeLayout = new RelativeLayout(this);
@@ -196,7 +182,13 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         final LayoutInflater inflater = (LayoutInflater) getBaseContext()
                 .getSystemService(LAYOUT_INFLATER_SERVICE);
         assert inflater != null;
-        final View popview = inflater.inflate(R.layout.custom_window_alternative, null);
+//        We need to make the window mananger occupy the whole screen for this to work
+//        paramsInnitializer paramsInnitializer = new paramsInnitializer();
+        WindowManager.LayoutParams params = paramsInnitializer.wmInnitializer(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
+//        but it should be noted that the window menanger layout parameters should be returned to WrapContnent
+//        once the custom window is closed. So as to gain access to the screen while the mtouch is returned
+//        final View popview = inflater.inflate(R.layout.custom_window_alternative, null); //the original
+        final View popview = inflater.inflate(R.layout.custom_window, null);
 
         /*relative layout for the menu getting the params of windowmanager
          * and adding rules*/
@@ -204,24 +196,18 @@ public class MTouchService extends Service implements View.OnTouchListener, View
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
 
-//        viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
-//        viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-        viewParams.addRule(RelativeLayout.ALIGN_LEFT, RelativeLayout.TRUE);
-//        viewParams.addRule(RelativeLayout.LEFT_OF, btnOverlay);
-        params_imageview.addRule(RelativeLayout.LEFT_OF, R.id.caLayout);
-
-
-
+        viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
+        viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
         if (settingButton.isEnable()) {
-            settingButton = new SettingButton(popview, relativeLayout, this);
+            settingButton = new SettingButton(popview, relativeLayout, overlayedButton, paramsInnitializer, windowManager, this);
             /*adding the popview menu
              * together with its
              * viewparams
              * to the main relative layout*/
-            relativeLayout.updateViewLayout(overlayedButton, params_imageview);
-            //relativeLayout.removeView(overlayedButton);
+            relativeLayout.removeAllViewsInLayout();
             relativeLayout.addView( popview, viewParams);
+            windowManager.updateViewLayout(relativeLayout, params);
             tempoView = popview;
             settingButton.setEnable(false);
             settingButton.settingButton();
@@ -244,8 +230,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
             //initial position
-            initialX = params.x;
-            initialY = params.y;
+            initialX = paramsInnitializer.getxCoordinate();
+            initialY = paramsInnitializer.getyCoordinate();
 
             //touch locationn
             initialTouchX = motionEvent.getRawX();
@@ -253,12 +239,17 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 
             return moving;
 
+
         } else if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
 
             //calculate x and y coordinate of view
 
-            params.x = initialX + (int) (motionEvent.getRawX() - initialTouchX);
-            params.y = initialY + (int) (motionEvent.getRawY() - initialTouchY);
+            paramsInnitializer.setxCoordinate(initialX + (int) (motionEvent.getRawX() - initialTouchX));
+            paramsInnitializer.setyCoordinate(initialY + (int) (motionEvent.getRawY() - initialTouchY));
+
+            params.x = paramsInnitializer.getxCoordinate();
+            params.y = paramsInnitializer.getyCoordinate();
+
 
             //update the layout
             windowManager.updateViewLayout(relativeLayout, params);
@@ -271,7 +262,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             //position to left | right always
             int middle = mWidth / 2;
             float nearestXWall = params.x >= middle ? mWidth : 0;
-            params.x = (int) nearestXWall;
+            paramsInnitializer.setxCoordinate((int) nearestXWall);
+            params.x = paramsInnitializer.getxCoordinate();
 
             windowManager.updateViewLayout(relativeLayout, params);
 
@@ -282,5 +274,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         return false;
 
     }
+
+
 
 }

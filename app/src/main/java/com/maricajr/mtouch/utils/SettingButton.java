@@ -5,26 +5,37 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.maricajr.mtouch.MainActivity;
 import com.maricajr.mtouch.R;
+import com.maricajr.mtouch.utils.service.MTouchService;
 
 import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
 
 /*menu button class*/
 public class SettingButton {
     private View popview;
+    private ImageView overlayedButton;
     private RelativeLayout relativeLayout;
     private Context context;
     private boolean enable = false;
+    MTouchService mTouchService = new MTouchService();
+    private paramsInnitializer wmParams = new paramsInnitializer();
+    private WindowManager windowManager;
 
-    public SettingButton(View popview, RelativeLayout relativeLayout, Context context) {
+
+    public SettingButton(View popview, RelativeLayout relativeLayout, ImageView overlayedButton, paramsInnitializer wmParams, WindowManager windowManager, Context context) {
         this.popview = popview;
         this.relativeLayout = relativeLayout;
+        this.overlayedButton = overlayedButton;
+        this.wmParams = wmParams;
+        this.windowManager = windowManager;
         this.context = context;
+
     }
 
     public SettingButton(Context context) {
@@ -41,6 +52,8 @@ public class SettingButton {
             @Override
             public void onClick(View view) {
                 relativeLayout.removeView(popview);
+                relativeLayout.addView(overlayedButton);
+                windowManager.updateViewLayout(relativeLayout, wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT));
                 setEnable(true);
             }
         });
@@ -54,6 +67,7 @@ public class SettingButton {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
                 relativeLayout.removeView(popview);
+                relativeLayout.addView(overlayedButton);
                 setEnable(true);
             }
         });
@@ -64,6 +78,7 @@ public class SettingButton {
             public void onClick(View view) {
                 enableBluetooth();
                 relativeLayout.removeView(popview);
+                relativeLayout.addView(overlayedButton);
                 setEnable(true);
             }
         });
@@ -74,6 +89,7 @@ public class SettingButton {
             public void onClick(View view) {
                 enableWiFi();
                 relativeLayout.removeView(popview);
+                relativeLayout.addView(overlayedButton);
                 setEnable(true);
             }
         });
@@ -86,6 +102,7 @@ public class SettingButton {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
                 relativeLayout.removeView(popview);
+                relativeLayout.addView(overlayedButton);
                 setEnable(true);
             }
         });
