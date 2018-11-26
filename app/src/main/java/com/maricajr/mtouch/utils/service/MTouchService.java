@@ -43,7 +43,7 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     private RestartService restartService;
     private View tempoView;
     private final int btnOverlay = View.generateViewId();
-    private static paramsInnitializer paramsInnitializer = new paramsInnitializer();
+    private paramsInnitializer paramsInnitializer = new paramsInnitializer();
 /// find a way to get rid of tempoview
     @Nullable
     @Override
@@ -196,6 +196,8 @@ public class MTouchService extends Service implements View.OnTouchListener, View
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
 
+//        viewParams.addRule(RelativeLayout.ALIGN_PARENT_START, RelativeLayout.TRUE); // this is to put with the alternate view
+
         viewParams.addRule(RelativeLayout.CENTER_HORIZONTAL, RelativeLayout.TRUE);
         viewParams.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
@@ -206,8 +208,10 @@ public class MTouchService extends Service implements View.OnTouchListener, View
              * viewparams
              * to the main relative layout*/
             relativeLayout.removeAllViewsInLayout();
+            windowManager.removeView(relativeLayout);
             relativeLayout.addView( popview, viewParams);
-            windowManager.updateViewLayout(relativeLayout, params);
+            windowManager.addView(relativeLayout, params);
+//            windowManager.updateViewLayout(relativeLayout, params);
             tempoView = popview;
             settingButton.setEnable(false);
             settingButton.settingButton();
@@ -230,8 +234,10 @@ public class MTouchService extends Service implements View.OnTouchListener, View
         if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
             //initial position
-            initialX = paramsInnitializer.getxCoordinate();
-            initialY = paramsInnitializer.getyCoordinate();
+//            initialX = paramsInnitializer.getxCoordinate();
+//            initialY = paramsInnitializer.getyCoordinate();
+            initialX = params.x;
+            initialY = params.y;
 
             //touch locationn
             initialTouchX = motionEvent.getRawX();
@@ -262,8 +268,9 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             //position to left | right always
             int middle = mWidth / 2;
             float nearestXWall = params.x >= middle ? mWidth : 0;
-            paramsInnitializer.setxCoordinate((int) nearestXWall);
-            params.x = paramsInnitializer.getxCoordinate();
+
+            params.x = (int) nearestXWall;
+            paramsInnitializer.setxCoordinate(params.x);
 
             windowManager.updateViewLayout(relativeLayout, params);
 

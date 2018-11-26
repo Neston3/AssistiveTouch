@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
+import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -21,11 +22,12 @@ public class SettingButton {
     private View popview;
     private ImageView overlayedButton;
     private RelativeLayout relativeLayout;
+    private RelativeLayout.LayoutParams params_imageview;
     private Context context;
     private boolean enable = false;
-    MTouchService mTouchService = new MTouchService();
-    private paramsInnitializer wmParams = new paramsInnitializer();
+    private paramsInnitializer wmParams;
     private WindowManager windowManager;
+
 
 
     public SettingButton(View popview, RelativeLayout relativeLayout, ImageView overlayedButton, paramsInnitializer wmParams, WindowManager windowManager, Context context) {
@@ -52,8 +54,18 @@ public class SettingButton {
             @Override
             public void onClick(View view) {
                 relativeLayout.removeView(popview);
-                relativeLayout.addView(overlayedButton);
-                windowManager.updateViewLayout(relativeLayout, wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT));
+                params_imageview = new RelativeLayout.LayoutParams(
+                        WindowManager.LayoutParams.WRAP_CONTENT,
+                        WindowManager.LayoutParams.WRAP_CONTENT);
+
+                params_imageview.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+
+                WindowManager.LayoutParams params = wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                params.gravity = Gravity.START;
+//                windowManager.updateViewLayout(relativeLayout, params);
+                windowManager.removeView(relativeLayout);
+                relativeLayout.addView(overlayedButton, params_imageview);
+                windowManager.addView(relativeLayout, params);
                 setEnable(true);
             }
         });
@@ -67,7 +79,7 @@ public class SettingButton {
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
                 relativeLayout.removeView(popview);
-                relativeLayout.addView(overlayedButton);
+                relativeLayout.addView(overlayedButton, wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT));
                 setEnable(true);
             }
         });
