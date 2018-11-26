@@ -27,10 +27,11 @@ public class SettingButton {
     private boolean enable = false;
     private paramsInnitializer wmParams;
     private WindowManager windowManager;
+    private CustomView customView;
 
 
 
-    public SettingButton(View popview, RelativeLayout relativeLayout, ImageView overlayedButton, paramsInnitializer wmParams, WindowManager windowManager, Context context) {
+   public SettingButton(View popview, RelativeLayout relativeLayout, ImageView overlayedButton, paramsInnitializer wmParams, WindowManager windowManager, Context context) {
         this.popview = popview;
         this.relativeLayout = relativeLayout;
         this.overlayedButton = overlayedButton;
@@ -54,18 +55,21 @@ public class SettingButton {
             @Override
             public void onClick(View view) {
                 relativeLayout.removeView(popview);
-                params_imageview = new RelativeLayout.LayoutParams(
-                        WindowManager.LayoutParams.WRAP_CONTENT,
-                        WindowManager.LayoutParams.WRAP_CONTENT);
-
-                params_imageview.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-
-                WindowManager.LayoutParams params = wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
-                params.gravity = Gravity.START;
-//                windowManager.updateViewLayout(relativeLayout, params);
-                windowManager.removeView(relativeLayout);
-                relativeLayout.addView(overlayedButton, params_imageview);
-                windowManager.addView(relativeLayout, params);
+//                params_imageview = new RelativeLayout.LayoutParams(
+//                        WindowManager.LayoutParams.WRAP_CONTENT,
+//                        WindowManager.LayoutParams.WRAP_CONTENT);
+//
+//                params_imageview.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
+//
+//                WindowManager.LayoutParams params = wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
+//                params.gravity = Gravity.START;
+////                windowManager.updateViewLayout(relativeLayout, params);
+//                windowManager.removeView(relativeLayout);
+//                relativeLayout.addView(overlayedButton, params_imageview);
+//                windowManager.addView(relativeLayout, params);
+                customView = new CustomView(overlayedButton, windowManager, relativeLayout, wmParams
+                );
+                customView.removeCustomeView();
                 setEnable(true);
             }
         });
