@@ -4,7 +4,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiManager;
-import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
@@ -13,7 +12,7 @@ import android.widget.Toast;
 
 import com.maricajr.mtouch.MainActivity;
 import com.maricajr.mtouch.R;
-import com.maricajr.mtouch.utils.service.MTouchService;
+import com.maricajr.mtouch.ViewsSettings.CustomView;
 
 import static android.bluetooth.BluetoothAdapter.getDefaultAdapter;
 
@@ -22,7 +21,6 @@ public class SettingButton {
     private View popview;
     private ImageView overlayedButton;
     private RelativeLayout relativeLayout;
-    private RelativeLayout.LayoutParams params_imageview;
     private Context context;
     private boolean enable = false;
     private paramsInnitializer wmParams;
@@ -55,20 +53,7 @@ public class SettingButton {
             @Override
             public void onClick(View view) {
                 relativeLayout.removeView(popview);
-//                params_imageview = new RelativeLayout.LayoutParams(
-//                        WindowManager.LayoutParams.WRAP_CONTENT,
-//                        WindowManager.LayoutParams.WRAP_CONTENT);
-//
-//                params_imageview.addRule(RelativeLayout.CENTER_VERTICAL, RelativeLayout.TRUE);
-//
-//                WindowManager.LayoutParams params = wmParams.wmInnitializer(WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT);
-//                params.gravity = Gravity.START;
-////                windowManager.updateViewLayout(relativeLayout, params);
-//                windowManager.removeView(relativeLayout);
-//                relativeLayout.addView(overlayedButton, params_imageview);
-//                windowManager.addView(relativeLayout, params);
-                customView = new CustomView(overlayedButton, windowManager, relativeLayout, wmParams
-                );
+                customView = new CustomView(overlayedButton, windowManager, relativeLayout, wmParams);
                 customView.removeCustomeView();
                 setEnable(true);
             }

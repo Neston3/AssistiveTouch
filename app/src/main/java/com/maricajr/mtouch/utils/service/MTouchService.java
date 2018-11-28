@@ -20,7 +20,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.maricajr.mtouch.R;
-import com.maricajr.mtouch.utils.CustomView;
+import com.maricajr.mtouch.ViewsSettings.CustomView;
+import com.maricajr.mtouch.ViewsSettings.CustomViewAlternate;
 import com.maricajr.mtouch.utils.SettingButton;
 import com.maricajr.mtouch.utils.paramsInnitializer;
 
@@ -42,7 +43,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
     SharedPreferences sharedPreferences;
     private SettingButton settingButton;
     private RestartService restartService;
-    private View tempoView;
     private final int btnOverlay = View.generateViewId();
     private paramsInnitializer paramsInnitializer = new paramsInnitializer();
 /// find a way to get rid of tempoview
@@ -224,8 +224,10 @@ public class MTouchService extends Service implements View.OnTouchListener, View
 //            settingButton.setEnable(true);
 //        }
 
-        CustomView customView = new CustomView(overlayedButton, windowManager, relativeLayout, paramsInnitializer);
-        customView.Innitialize_CustomView(inflater, params_imageview, settingButton,this);
+//        CustomView customView = new CustomView(overlayedButton, windowManager, relativeLayout, paramsInnitializer);
+        CustomViewAlternate customViewAlternate = new CustomViewAlternate(overlayedButton, windowManager, relativeLayout, paramsInnitializer);
+//        customView.Innitialize_CustomView(inflater, params_imageview, settingButton,this);
+        customViewAlternate.Innitialize_CustomView(inflater, params_imageview, settingButton,this);
 
     }
 
@@ -239,7 +241,6 @@ public class MTouchService extends Service implements View.OnTouchListener, View
             //initial position
             initialX = paramsInnitializer.getxCoordinate();
             initialY = paramsInnitializer.getyCoordinate();
-//
 
             //touch locationn
             initialTouchX = motionEvent.getRawX();

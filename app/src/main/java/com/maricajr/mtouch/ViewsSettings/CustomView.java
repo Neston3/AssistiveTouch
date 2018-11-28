@@ -1,4 +1,4 @@
-package com.maricajr.mtouch.utils;
+package com.maricajr.mtouch.ViewsSettings;
 
 import android.content.Context;
 import android.view.Gravity;
@@ -9,16 +9,16 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.maricajr.mtouch.R;
+import com.maricajr.mtouch.utils.SettingButton;
+import com.maricajr.mtouch.utils.paramsInnitializer;
 
 
 public class CustomView {
 
-    private SettingButton settingButton;
     private RelativeLayout relativeLayout;
-    private paramsInnitializer paramsInnitializer;
+    private com.maricajr.mtouch.utils.paramsInnitializer paramsInnitializer;
     private ImageView overlayedButton;
     private View tempoView;
-    private RelativeLayout.LayoutParams params_imageview;
     private WindowManager windowManager;
 
 
@@ -38,7 +38,7 @@ public class CustomView {
         WindowManager.LayoutParams params = paramsInnitializer.wmInnitializer(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT);
 //        but it should be noted that the window menanger layout parameters should be returned to WrapContnent
 //        once the custom window is closed. So as to gain access to the screen while the mtouch is returned
-//        final View popview = inflater.inflate(R.layout.custom_window_alternative, null); //the original
+//        final View popview = inflater.inflate(R.layout.custom_window_alternative, null);
         final View popview = inflater.inflate(R.layout.custom_window, null);
 
         /*relative layout for the menu getting the params of windowmanager
@@ -78,7 +78,7 @@ public class CustomView {
     //removing the  custom view after using the services in setting Button
 
     public void removeCustomeView(){
-        params_imageview = new RelativeLayout.LayoutParams(
+        RelativeLayout.LayoutParams params_imageview = new RelativeLayout.LayoutParams(
                 WindowManager.LayoutParams.WRAP_CONTENT,
                 WindowManager.LayoutParams.WRAP_CONTENT);
 

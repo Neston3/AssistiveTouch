@@ -15,7 +15,6 @@ public class paramsInnitializer {
     }
     private int xCoordinate;
     private int yCoordinate;
-    private int mWidth;
 
     public int getxCoordinate() {
         return xCoordinate;
